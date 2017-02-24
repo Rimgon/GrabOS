@@ -22,10 +22,10 @@ import cc.arduino.*;
 
 ControlIO control;
 ControlDevice stick;
-float px, py;
+float px, py, stickX, stickY;
 boolean grabButton;
 int retCol;
-byte grabber;
+String grabber;
 
 Serial serialPort;
 
@@ -33,7 +33,7 @@ Serial serialPort;
 public void setup() {
   size(400, 400);
   println(Arduino.list());
-  serialPort = new Serial(this, Serial.list()[0], 9600);
+  serialPort = new Serial(this, Serial.list()[0], 115200);
   // Initialise the ControlIO
   control = ControlIO.getInstance(this);
   // Find a device that matches the configuration file
@@ -50,8 +50,10 @@ public void setup() {
 
 // Poll for user input called from the draw() method.
 public void getUserInput() {
-  px = map(stick.getSlider("X").getValue(), -1, 1, 0, 1);
-  py = map(stick.getSlider("Y").getValue(), -1, 1, 0, 1);
+  px = map(stick.getSlider("X").getValue(), -1, 1, 0, 400);
+  py = map(stick.getSlider("Y").getValue(), -1, 1, 0, 400);
+  stickX = stick.getSlider("X").getValue();
+  stickY = stick.getSlider("Y").getValue();
   grabButton = stick.getButton("GRAB").pressed();
 }
 
@@ -70,10 +72,10 @@ public void draw() {
   
   if(grabButton){
     retCol = 0;
-    grabber = 'T';
+    grabber = "T";
   }else{
     retCol = 255;
-    grabber = 'F';
+    grabber = "F";
   }
 
   
@@ -85,8 +87,12 @@ public void draw() {
   //Show position
   noStroke();
   fill(64, retCol, 64, 64);
-  ellipse(filter(px)*height, filter(py)*width, 20, 20);
+  ellipse(px, py, 20, 20);
   
   //Talk to the arduino over serial
-  serialPort.write(grabber + " " + filter(px)+ " " +filter(py));
+  //serialPort.write(grabber + " " + filter(px)+ " " +filter(py));
+  //serialPort.write(grabber);
+  serialPort.write(grabber+abs(round(stickX*100)));
+  //serialPort.write(mouseX);
+
 }

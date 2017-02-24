@@ -41,7 +41,7 @@ void setup() {
   //Wrist vertical (M4): 180 degrees
   //Wrist rotation (M5): 90 degrees
   //gripper (M6): 10 degrees
-  Serial.begin(9600);
+  Serial.begin(115200);
   while(!Serial){
     //Wait for the serial bus to connect over USB
   }
