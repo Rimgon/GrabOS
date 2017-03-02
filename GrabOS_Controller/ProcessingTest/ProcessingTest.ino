@@ -19,16 +19,15 @@
   modified 8 Sep 2016
   by Colby Newman
 */
-byte serialIn;
+int serialIn;
 int ledPin = 9;
 String grabber;
 
 // the setup function runs once when you press reset or power the board
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
-  pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(13, OUTPUT);
 
-  pinMode(ledPin, OUTPUT);
   
   Serial.begin(115200);
   while(!Serial){
@@ -38,44 +37,11 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
-  if(Serial.available()){
-    
 
-    // read the most recent byte (which will be from 0 to 255):
-    serialIn = Serial.read();
-    //grabber = serialIn.remove(0, 1);
-    // set the brightness of the LED:
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(1000);
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(1000);
-  }else{
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(100);
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(100);
-  }
-  /*
-    if (serialIn < 2000){
-      digitalWrite(LED_BUILTIN, HIGH);
-    }else{
-      digitalWrite(LED_BUILTIN, LOW);
-    }
-  }
-  delay(1000);
-  */
+    serialIn = (int)Serial.read();
+    digitalWrite(13, HIGH);
+    delay(2000);
+    digitalWrite(13, LOW);
+    delay(2000);
 
-
-
-  
-  /*commandLetter = Serial.readStringUntil(' ');
-  char firstChar = commandLetter.charAt(0);
-  if(firstChar == 'T'){
-    digitalWrite(LED_BUILTIN, HIGH);
-  }
-  if(firstChar == 'F'){
-    digitalWrite(LED_BUILTIN, LOW);
-    Serial.print("I'm reading an F!");
-  }
-  delay(2000);*/
 }
