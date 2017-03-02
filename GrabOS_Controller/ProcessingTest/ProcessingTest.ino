@@ -19,7 +19,7 @@
   modified 8 Sep 2016
   by Colby Newman
 */
-String serialIn;
+byte serialIn;
 int ledPin = 9;
 String grabber;
 
@@ -40,13 +40,20 @@ void setup() {
 void loop() {
   if(Serial.available()){
     
-    if (Serial.available()) {
+
     // read the most recent byte (which will be from 0 to 255):
-    serialIn = (String)Serial.read();
-    grabber = serialIn.remove(0, 1);
+    serialIn = Serial.read();
+    //grabber = serialIn.remove(0, 1);
     // set the brightness of the LED:
-    analogWrite(ledPin, serialIn);
-  }
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(1000);
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(1000);
+  }else{
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(100);
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(100);
   }
   /*
     if (serialIn < 2000){
