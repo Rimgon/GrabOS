@@ -92,7 +92,7 @@ public void draw() {
   //Talk to the arduino over serial
   //serialPort.write(grabber + " " + filter(px)+ " " +filter(py));
   //serialPort.write(grabber);
-  serialPort.write(abs(round((stickX*100)+100)));    //Write an output from 0 to 200
-  //serialPort.write(mouseX);
+  //serialPort.write(abs(round((stickX*100)+100)));    //Write an output from 0 to 200
+  serialPort.write(mouseX);
 
 }
