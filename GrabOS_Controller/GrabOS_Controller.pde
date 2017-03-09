@@ -1,54 +1,51 @@
+//Processing code for this example
+ // Dimmer - sends bytes over a serial port
+ // by David A. Mellis
+ //This example code is in the public domain.
 
-
-
-/**
- Basic demonstration of using a joystick.
+ import processing.serial.*;
+ import org.gamecontrolplus.*;
+ import org.gamecontrolplus.gui.*;
  
- When this sketch runs it will try and find
- a game device that matches the configuration
- file 'joystick' if it can't match this device
- then it will present you with a list of devices
- you might try and use.
  
- The chosen device requires 2 sliders and 2 buttons.
- */
-
-import org.gamecontrolplus.gui.*;
-import org.gamecontrolplus.*;
-import net.java.games.input.*;
-
-import processing.serial.*;
-import cc.arduino.*;
-
+Serial port;
 ControlIO control;
 ControlDevice stick;
 float px, py, stickX, stickY;
 boolean grabButton;
-int retCol;
+int retCol[] = {255, 0};
 String grabber;
 
-Serial serialPort;
 
+ void setup() {
+ size(400, 400);
 
-public void setup() {
-  size(400, 400);
-  println(Arduino.list());
-  serialPort = new Serial(this, Serial.list()[0], 115200);
-  // Initialise the ControlIO
-  control = ControlIO.getInstance(this);
-  // Find a device that matches the configuration file
-  stick = control.getMatchedDevice("joystick");
-  if (stick == null) {
-    println("No suitable device configured");
-    System.exit(-1); // End the program NOW!
-  }
-  
+ println("Available serial ports:");
+ // if using Processing 2.1 or later, use Serial.printArray()
+ println(Serial.list());
 
-  
-  
-}
+ // Uses the first port in this list (number 0).  Change this to
+ // select the port corresponding to your Arduino board.  The last
+ // parameter (e.g. 9600) is the speed of the communication.  It
+ // has to correspond to the value passed to Serial.begin() in your
+ // Arduino sketch.
+ port = new Serial(this, Serial.list()[0], 9600);
 
-// Poll for user input called from the draw() method.
+ // If you know the name of the port used by the Arduino board, you
+ // can specify it directly like this.
+ //port = new Serial(this, "COM1", 9600);
+ 
+ 
+ control = ControlIO.getInstance(this);
+ stick = control.getMatchedDevice("joystick");
+ if(stick == null){
+     println("No suitable device configured");
+     System.exit(-1);
+ }
+ }
+ 
+ 
+ // Poll for user input called from the draw() method.
 public void getUserInput() {
   px = map(stick.getSlider("X").getValue(), -1, 1, 0, 400);
   py = map(stick.getSlider("Y").getValue(), -1, 1, 0, 400);
@@ -56,43 +53,43 @@ public void getUserInput() {
   stickY = stick.getSlider("Y").getValue();
   grabButton = stick.getButton("GRAB").pressed();
 }
+ 
 
-public float filter(float raw){
-  if (raw < 0.05){                //Deadzone, to avoid unwanted movements
-    return 0;
-  }else{
-    return raw;                   //Tune movement here
-  }
-}
-
-
-public void draw() {
-  getUserInput(); // Polling
-  background(128, 128, 128);
-  
+ void draw() {
+ getUserInput();
+ // draw a gradient from black to white
+ for (int i = 0; i < 256; i++) {
+ stroke(i);
+ line(i, 0, i, 150);
+ }
+ 
+ 
+ background(128, 128, 128);
+ 
   if(grabButton){
-    retCol = 0;
+    retCol[0] = 0;
+    retCol[1] = 255;
     grabber = "T";
   }else{
-    retCol = 255;
+    retCol[0] = 255;
+    retCol[1] = 0;
     grabber = "F";
   }
-
-  
-  //Draw axes
+ 
+ 
+   //Draw axes
   stroke(0);
   line(200, 0, 200, 400);
   line(0, 200, 400, 200);
 
-  //Show position
+//Show position
   noStroke();
-  fill(64, retCol, 64, 64);
+  fill(retCol[0], retCol[1], 0, 64);
   ellipse(px, py, 20, 20);
   
-  //Talk to the arduino over serial
-  //serialPort.write(grabber + " " + filter(px)+ " " +filter(py));
-  //serialPort.write(grabber);
-  //serialPort.write(abs(round((stickX*100)+100)));    //Write an output from 0 to 200
-  serialPort.write(mouseX);
-
-}
+ // write the current X-position of the mouse to the serial port as
+ // a single byte
+ port.write((byte)map(stickX, -1, 1, 0, 400));
+ //port.write(mouseX);
+ }
+ 
