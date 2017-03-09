@@ -14,7 +14,7 @@ ControlDevice stick;
 float px, py, stickX, stickY;
 boolean grabButton;
 int retCol[] = {255, 0};
-String grabber;
+byte grabber;
 
 
  void setup() {
@@ -69,11 +69,11 @@ public void getUserInput() {
   if(grabButton){
     retCol[0] = 0;
     retCol[1] = 255;
-    grabber = "T";
+    grabber = 1;
   }else{
     retCol[0] = 255;
     retCol[1] = 0;
-    grabber = "F";
+    grabber = 0;
   }
  
  
@@ -89,7 +89,11 @@ public void getUserInput() {
   
  // write the current X-position of the mouse to the serial port as
  // a single byte
- port.write((byte)map(stickX, -1, 1, 0, 400));
- //port.write(mouseX);
+ byte out[] = new byte[3];
+ out[0] = grabber;
+ out[1] = (byte)abs(map(stickX, -1, 1, 0, 255)+0);
+ out[2] = (byte)abs(map(stickY, -1, 1, 0, 255)+0);
+ print(out[0]+" "+out[1]+" "+out[2]+"\n");
+ port.write(out);
  }
  
