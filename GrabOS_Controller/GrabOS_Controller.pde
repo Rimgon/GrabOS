@@ -91,8 +91,8 @@ public void getUserInput() {
  // a single byte
  byte out[] = new byte[3];
  out[0] = grabber;
- out[1] = (byte)abs(map(stickX, -1, 1, 0, 255)+0);
- out[2] = (byte)abs(map(stickY, -1, 1, 0, 255)+0);
+ out[1] = (byte)abs(map(stickX+1, 0, 2, 0, 255)+0);
+ out[2] = (byte)abs(map(stickY+1, 0, 2, 0, 255)+0);
  print(out[0]+" "+out[1]+" "+out[2]+"\n");
  port.write(out);
  }
