@@ -7,6 +7,7 @@
  import org.gamecontrolplus.*;
  import org.gamecontrolplus.gui.*;
  
+ PFont f;
  
 Serial port;
 ControlIO control;
@@ -19,6 +20,9 @@ byte grabber;
 
  void setup() {
  size(400, 400);
+ 
+ f = createFont("Arial", 16, true);
+ textFont(f,36);
 
  println("Available serial ports:");
  // if using Processing 2.1 or later, use Serial.printArray()
@@ -64,13 +68,12 @@ public void getUserInput() {
  void draw() {
  getUserInput();
  // draw a gradient from black to white
- for (int i = 0; i < 256; i++) {
- stroke(i);
- line(i, 0, i, 150);
- }
- 
+
  
  background(128, 128, 128);
+ 
+ fill(255);
+ 
  
   if(grabButton){
     retCol[0] = 0;
@@ -99,10 +102,14 @@ public void getUserInput() {
  out[0] = grabber;
  out[1] = (byte)abs(map(stickX, -1, 1, 0, 127)+0);
  out[2] = (byte)abs(map(stickY, -1, 1, 0, 127)+0);
+ 
+    text(out[0]+" "+out[1]+" "+out[2]+" "+map(out[out.length-2], 0, 127, 0, 180), 10, 100);
+ 
  if(commandButton){
-   print(out[0]+" "+out[1]+" "+out[2]+"\n");
-   println(map(out[out.length-2], 0, 127, 0, 180));
    port.write(out);
+ }
+ if(port.available()>0){
+   print(port.readString());
  }
  }
  
