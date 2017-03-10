@@ -32,6 +32,9 @@ int wristVerticalPos = 180;
 int wristRotationPos = 90;
 int gripperPos = 10;
 
+byte currentValue = 0;
+byte values[] = {0,0,0};
+
 void setup() {  
   //Initialization functions and set up the initial position for Braccio
   //All the servo motors will be positioned in the "safety" position:
@@ -51,77 +54,15 @@ void setup() {
   
 }
 
-void loop() {
 
 
-
-  /*
-   Step Delay: a milliseconds delay between the movement of each servo.  Allowed values from 10 to 30 msec.
-   M1=base degrees. Allowed values from 0 to 180 degrees
-   M2=shoulder degrees. Allowed values from 15 to 165 degrees
-   M3=elbow degrees. Allowed values from 0 to 180 degrees
-   M4=wrist vertical degrees. Allowed values from 0 to 180 degrees
-   M5=wrist rotation degrees. Allowed values from 0 to 180 degrees
-   M6=gripper degrees. Allowed values from 10 to 73 degrees. 10: the toungue is open, 73: the gripper is closed.
-  */
-  
-  // the arm is aligned upwards  and the gripper is closed
-                     //(step delay, M1, M2, M3, M4, M5, M6);
-  Serial.println("GrabOS Version 0.6 by Alex King. Name subject to change.\nIn case of emergency, text at 740-549-1070.");
-  Serial.println("Initializing main loop...");
-  Serial.println(">>>>>COMMAND SYNTAX<<<<<\n Specify servo to move\n \tb - base\n \ts - shoulder\n \te - elbow\n \tv - wrist vertical\n \tr - wrist rotation\n \tg - gripper\n then degree value. Limits are as follows:\n \tBase: 0-180\n\tShoulder: 15-165\n\tElbow: 0-180\n\tWrist Vertical: 0-180\n\tWrist Rotation: 0-180\n\tGripper: 10-73 (Open to closed)\nInclude a space between the letter and the numerical value.\n Good luck!");
-  while (true){
-    
-    if(Serial.available() != 0){
-      commandLetter = Serial.readStringUntil(' ');
-      char firstChar = commandLetter.charAt(0);
-      Serial.print((String)firstChar + " ");
-
-      commandValue = Serial.parseInt();
-      Serial.println(commandValue);
-      
-      
-      switch (firstChar) {
-        case 'b':
-          moveBase(commandValue);
-          break;
-  
-        case 's':
-          moveShoulder(commandValue);
-          break;
-  
-        case 'e':
-          moveElbow(commandValue);
-          break;
-  
-        case 'v':
-          moveWristVertical(commandValue);
-          break;
-  
-        case 'r':
-          moveWristRotation(commandValue);
-          break;
-  
-        case 'g':
-          moveGripper(commandValue);
-          break;
-  
-        default:
-          Serial.println("Invalid command: First character not recognized.\n \tb - base\n \ts - shoulder\n \te - elbow\n \tv - wrist vertical\n \tr - wrist rotation\n \tg - gripper");
-        break;  
-      }
-    }
-    
-
-  }
-}
 
 //Homemade functions to do stuff that the arm won't do for us, namely relative movement
 
 void moveBase(int localBasePos){
   Serial.println("Setting base position to: " + (String)localBasePos);
   basePos = localBasePos;
-  Braccio.ServoMovement(20, basePos, shoulderPos, elbowPos, wristVerticalPos, wristRotationPos, gripperPos);
+  Braccio.ServoMovement(10, basePos, shoulderPos, elbowPos, wristVerticalPos, wristRotationPos, gripperPos);
   Serial.println("Done!");
 }
 
@@ -173,4 +114,37 @@ void setArmPos(int localArmSpeed, int localBasePos, int localShoulderPos, int lo
   wristRotationPos = localWristRotationPos;
   gripperPos = localGripperPos;
   Braccio.ServoMovement(localArmSpeed, localBasePos, localShoulderPos, localElbowPos, localWristVerticalPos, localWristRotationPos, localGripperPos);
+}
+
+
+
+void loop() {
+  
+  
+  
+  /*
+   Step Delay: a milliseconds delay between the movement of each servo.  Allowed values from 10 to 30 msec.
+   M1=base degrees. Allowed values from 0 to 180 degrees
+   M2=shoulder degrees. Allowed values from 15 to 165 degrees
+   M3=elbow degrees. Allowed values from 0 to 180 degrees
+   M4=wrist vertical degrees. Allowed values from 0 to 180 degrees
+   M5=wrist rotation degrees. Allowed values from 0 to 180 degrees
+   M6=gripper degrees. Allowed values from 10 to 73 degrees. 10: the toungue is open, 73: the gripper is closed.
+  */
+  
+  // the arm is aligned upwards  and the gripper is closed
+                     //(step delay, M1, M2, M3, M4, M5, M6);
+  if(Serial.available()){
+    int incomingValue = Serial.read();
+    values[currentValue] = incomingValue;
+  
+    currentValue++;
+    if(currentValue > 2){
+      currentValue = 0;
+    }
+    moveBase(map(values[sizeof(values)-2], 0, 127, 0, 180));
+  }
+  
+  
+
 }

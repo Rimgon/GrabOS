@@ -12,7 +12,7 @@ Serial port;
 ControlIO control;
 ControlDevice stick;
 float px, py, stickX, stickY;
-boolean grabButton;
+boolean grabButton, commandButton;
 int retCol[] = {255, 0};
 byte grabber;
 
@@ -23,6 +23,11 @@ byte grabber;
  println("Available serial ports:");
  // if using Processing 2.1 or later, use Serial.printArray()
  println(Serial.list());
+
+if(Serial.list().length < 1){
+  println("No arduino attached. Plug it in and try again.");
+  System.exit(-1);
+}
 
  // Uses the first port in this list (number 0).  Change this to
  // select the port corresponding to your Arduino board.  The last
@@ -52,6 +57,7 @@ public void getUserInput() {
   stickX = stick.getSlider("X").getValue();
   stickY = stick.getSlider("Y").getValue();
   grabButton = stick.getButton("GRAB").pressed();
+  commandButton = stick.getButton("COM").pressed();
 }
  
 
@@ -91,9 +97,12 @@ public void getUserInput() {
  // a single byte
  byte out[] = new byte[3];
  out[0] = grabber;
- out[1] = (byte)abs(map(stickX+1, 0, 2, 0, 255)+0);
- out[2] = (byte)abs(map(stickY+1, 0, 2, 0, 255)+0);
- print(out[0]+" "+out[1]+" "+out[2]+"\n");
- port.write(out);
+ out[1] = (byte)abs(map(stickX, -1, 1, 0, 127)+0);
+ out[2] = (byte)abs(map(stickY, -1, 1, 0, 127)+0);
+ if(commandButton){
+   print(out[0]+" "+out[1]+" "+out[2]+"\n");
+   println(map(out[out.length-2], 0, 127, 0, 180));
+   port.write(out);
+ }
  }
  
