@@ -142,8 +142,9 @@ void loop() {
     if(currentValue > 2){
       currentValue = 0;
     }
-    moveBase(map(values[sizeof(values)-1], 0, 127, 0, 180));
+    moveBase(map(values[3], 0, 127, 0, 180));
     //moveShoulder(map(values[sizeof(values)-2], 0, 127, 0, 180));
+    
   }
   
   
