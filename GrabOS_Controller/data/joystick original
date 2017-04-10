@@ -1,4 +1,8 @@
 Shadow maker
-X	X position	3	SLIDER	x	0	1.0	0.0
-Y	Y position	3	SLIDER	y	0	1.0	0.0
-GRAB	ToggleGrabber	1	BUTTON	0	0	0.0	0.0
+X	X position	3	SLIDER	X Axis	0	1.0	0.0
+Y	Y position	3	SLIDER	Y Axis	0	1.0	0.0
+GRAB	ToggleGrabber	1	BUTTON	Button 0	0	0.0	0.0
+BASE	Base 		1	BUTTON 	Button 4	0	0.0	0.0
+SHLD	Shoulder	1	BUTTON 	Button 3	0	0.0	0.0
+ELB	Elbow		1	BUTTON 	Button 5	0	0.0	0.0
+WRST	Wrist		1	BUTTON 	Button 2	0	0.0	0.0

@@ -135,15 +135,40 @@ void loop() {
   // the arm is aligned upwards  and the gripper is closed
                      //(step delay, M1, M2, M3, M4, M5, M6);
   if(Serial.available()){
-    int incomingValue = Serial.read();
+    byte incomingValue = Serial.read();
     values[currentValue] = incomingValue;
   
     currentValue++;
     if(currentValue > 2){
       currentValue = 0;
     }
-    moveBase(map(values[3], 0, 127, 0, 180));
-    //moveShoulder(map(values[sizeof(values)-2], 0, 127, 0, 180));
+    
+    for(int i = 0; i < sizeof(values); i++){
+      Serial.println(values[i]);
+    }
+    
+    byte activeMotor = values[0];
+
+    switch(activeMotor){
+      case 1:     //Base
+        moveBase(map(values[1], 0, 127, 0, 180));
+      break;
+      case 2:     //Shoulder
+        moveShoulder(map(values[2], 0, 127, 0, 180));
+      break;
+      case 3:     //Elbow
+        moveElbow(map(values[2], 0, 127, 0, 180));
+      break;
+      case 4:     //Wrist vertical 
+        moveWristVertical(map(values[2], 0, 127, 0, 180));
+      break;
+    }
+
+    /*if(values[3] == 1){
+      moveGripper(70);
+    }else{
+      moveGripper(10);
+    }*/
     
   }
   

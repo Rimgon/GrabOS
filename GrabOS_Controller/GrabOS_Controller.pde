@@ -13,9 +13,11 @@ Serial port;
 ControlIO control;
 ControlDevice stick;
 float px, py, stickX, stickY;
-boolean grabButton, commandButton;
+boolean Grabber, Base, Shoulder, Elbow, Wrist;
 int retCol[] = {255, 0};
-byte grabber;
+byte activeMotor;
+byte GrabberState;
+boolean hasWritten = false;
 
 
  void setup() {
@@ -60,8 +62,11 @@ public void getUserInput() {
   py = map(stick.getSlider("Y").getValue(), -1, 1, 0, 400);
   stickX = stick.getSlider("X").getValue();
   stickY = stick.getSlider("Y").getValue();
-  grabButton = stick.getButton("GRAB").pressed();
-  commandButton = stick.getButton("COM").pressed();
+  Grabber = stick.getButton("GRAB").pressed();
+  Base = stick.getButton("BASE").pressed();      //1
+  Shoulder = stick.getButton("SHLD").pressed();  //2
+  Elbow = stick.getButton("ELB").pressed();      //3
+  Wrist = stick.getButton("WRST").pressed();     //4
 }
  
 
@@ -73,16 +78,30 @@ public void getUserInput() {
  background(128, 128, 128);
  
  fill(255);
+
+
+ 
+ if(Wrist){
+   activeMotor = 4;
+ }else if(Elbow){
+   activeMotor = 3;
+ }else if(Shoulder){
+   activeMotor = 2;
+ }else if(Base){
+   activeMotor = 1;
+ }else {
+   activeMotor = 0;
+ }
  
  
-  if(grabButton){
+  if(Grabber){
     retCol[0] = 0;
     retCol[1] = 255;
-    grabber = 1;
+    GrabberState = 1;
   }else{
     retCol[0] = 255;
     retCol[1] = 0;
-    grabber = 0;
+    GrabberState = 0;
   }
  
  
@@ -99,14 +118,19 @@ public void getUserInput() {
  // write the current X-position of the mouse to the serial port as
  // a single byte
  byte out[] = new byte[3];
- out[0] = grabber;
+ out[0] = activeMotor;
  out[1] = (byte)abs(map(stickX, -1, 1, 0, 127)+0);
- out[2] = (byte)abs(map(stickY, -1, 1, 0, 127)+0);
+ out[2] = (byte)(127-abs(map(stickY, -1, 1, 0, 127)+0));
+ //out[3] = GrabberState;
  
-    text(out[0]+" "+out[1]+" "+out[2]+" "+map(out[out.length-2], 0, 127, 0, 180), 10, 100);
+ text(out[0]+" "+out[1]+" "+out[2]+" "+map(out[out.length-2], 0, 127, 0, 180), 10, 100);
  
- if(commandButton){
+ if((activeMotor != 0 && hasWritten == false)/* || Grabber && hasWritten == false*/){
    port.write(out);
+   hasWritten = true;
+ }
+ if(activeMotor == 0){
+   hasWritten = false;
  }
  if(port.available()>0){
    print(port.readString());
